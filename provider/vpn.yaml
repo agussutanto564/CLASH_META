@@ -8,9 +8,10 @@ proxies:
     cipher: auto
     tls: true
     skip-cert-verify: true
-    servername: support.udemy.com # <--- WAJIB SAMA DENGAN BUG
+    servername: support.udemy.com
     network: ws
     ws-opts:
       path: /xrayvmess
       headers:
-        Host: support.udemy.com # <--- WAJIB SAMA DENGAN BUG
+        Host: support.udemy.com
+      # max-early-data: 2048 # Opsional, aktifkan jika server mendukung
