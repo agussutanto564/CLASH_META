@@ -3,7 +3,7 @@ proxies:
     type: vmess
     server: id-atha001.kegiatanja.my.id
     port: 443
-    uuid: [ISI_UUID_ANDA]
+    uuid: 9c988e0a-ba1a-558b-87d2-7a1c273cc56d
     alterId: 0
     cipher: auto
     tls: true
