@@ -6,15 +6,22 @@ mixed-port: 7893
 tproxy-port: 7895
 ipv6: false
 mode: rule
-log-level: silent
+log-level: info
 allow-lan: true
 unified-delay: true
 tcp-fast-open: false
 tcp-concurrent: true
 external-controller: 127.0.0.1:9090
-keep-alive-interval: 15
 
-# --- DNS SETTINGS (Dewa Mode Enabled) ---
+# --- MODE DAT AKTIF (Agar Geo-Files/ASN Terbaca) ---
+geodata-mode: true
+geox-url:
+  geoip: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
+  geosite: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
+  mmdb: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb"
+  asn: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/asn.dat"
+
+# --- DNS SETTINGS (Optimasi Kuota Edukasi XL) ---
 dns:
   enable: true
   ipv6: false
@@ -22,6 +29,11 @@ dns:
   fake-ip-range: 198.18.0.1/16
   listen: 0.0.0.0:7874
   fake-ip-filter:
+    - 'support.udemy.com'        # Bug Udemy Edukasi XL
+    - '*.support.udemy.com'      # Wildcard Bug Udemy
+    - 'classroom.google.com'
+    - '*.classroom.google.com'
+    - 'microsoft.com'
     - '+.google.com'
     - '+.gstatic.com'
     - '+.push.apple.com'
@@ -36,7 +48,7 @@ dns:
     - 1.1.1.1
     - 'https://dns.google/dns-query'
 
-# --- SNIFFER (QUIC Port Included) ---
+# --- SNIFFER ---
 sniffer:
   enable: true
   sniff:
@@ -62,9 +74,6 @@ proxy-providers:
 proxy-groups:
   - name: VPN
     type: select
-    # Tolerance tetap ada sebagai parameter kualitas koneksi tunggal Anda
-    url: http://cp.cloudflare.com/generate_204
-    interval: 150
     use:
       - Akun-VPN
 
@@ -75,14 +84,12 @@ rule-providers:
     url: "https://raw.githubusercontent.com/agussutanto564/CLASH_META/main/provider/tiktok.yaml"
     interval: 86400
     path: "./provider/tiktok.yaml"
-
   Rule_WhatsApp:
     type: http
     behavior: classical
     url: "https://raw.githubusercontent.com/agussutanto564/CLASH_META/main/provider/whatsapp.yaml"
     interval: 86400
     path: "./provider/whatsapp.yaml"
-
   Rule_YouTube:
     type: http
     behavior: classical
@@ -91,11 +98,19 @@ rule-providers:
     path: "./provider/youtube.yaml"
 
 rules:
+  # 1. Bypass Lokal & LAN
   - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
   - GEOIP,LAN,DIRECT
+  
+  # 2. Rule Aplikasi (WA, TikTok, YouTube)
   - RULE-SET,Rule_WhatsApp,VPN
   - RULE-SET,Rule_TikTok,VPN
   - RULE-SET,Rule_YouTube,VPN
+  
+  # 3. Rule IP-ASN ISP Tunnel (CV Atha Media Prima)
+  - IP-ASN,139989,VPN
+  
+  # 4. Final Traffic (Paksa ke VPN demi Kuota Edukasi)
   - GEOIP,ID,VPN
   - MATCH,VPN
