@@ -1,4 +1,5 @@
 # --- CONFIGURATION OPTIMIZED (agussutanto564) ---
+# Dioptimalkan untuk Kuota Edukasi XL & DNS Fake-IP
 port: 7890
 socks-port: 7891
 redir-port: 7892
@@ -13,7 +14,7 @@ tcp-fast-open: false
 tcp-concurrent: true
 external-controller: 127.0.0.1:9090
 
-# --- MODE DAT AKTIF (Agar Geo-Files/ASN Terbaca) ---
+# --- MODE DAT AKTIF (Geo-Files) ---
 geodata-mode: true
 geox-url:
   geoip: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat"
@@ -21,25 +22,20 @@ geox-url:
   mmdb: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb"
   asn: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/asn.dat"
 
-# --- DNS SETTINGS (Optimasi Kuota Edukasi XL) ---
+# --- DNS SETTINGS (Fixed for Education Quota) ---
 dns:
   enable: true
   ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   listen: 0.0.0.0:7874
+  # Filter dikosongkan dari domain umum agar semua trafik 'terpaksa' masuk tunnel
   fake-ip-filter:
-    - 'support.udemy.com'        # Bug Udemy Edukasi XL
-    - '*.support.udemy.com'      # Wildcard Bug Udemy
-    - 'classroom.google.com'
-    - '*.classroom.google.com'
-    - 'microsoft.com'
-    - '+.google.com'
-    - '+.gstatic.com'
-    - '+.push.apple.com'
-    - '+.tiktok.com'
-    - '+.tiktokv.com'
-    - '+.tik-tokapi.com'
+    - '+.lan'
+    - '+.local'
+    - 'localhost'
+    - '*.msftncsi.com'
+    - 'msftconnecttest.com'
   default-nameserver:
     - 8.8.8.8
     - 1.1.1.1
@@ -48,16 +44,15 @@ dns:
     - 1.1.1.1
     - 'https://dns.google/dns-query'
 
-# --- SNIFFER ---
+# --- SNIFFER (Crucial for TLS/HTTPS) ---
 sniffer:
   enable: true
   sniff:
     TLS:
       ports: [443, 8443]
-    QUIC:
-      ports: [443, 8443]
     HTTP:
       ports: [80, 8080-8880]
+      override-destination: true # Memaksa tujuan sesuai hostname yang didapat sniffer
 
 proxy-providers:
   Akun-VPN:
@@ -108,9 +103,9 @@ rules:
   - RULE-SET,Rule_TikTok,VPN
   - RULE-SET,Rule_YouTube,VPN
   
-  # 3. Rule IP-ASN ISP Tunnel (CV Atha Media Prima)
+  # 3. Rule IP-ASN ISP Tunnel
   - IP-ASN,139989,VPN
   
-  # 4. Final Traffic (Paksa ke VPN demi Kuota Edukasi)
+  # 4. Final Traffic
   - GEOIP,ID,VPN
   - MATCH,VPN
